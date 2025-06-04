@@ -1,1 +1,7 @@
-<p>character-list works!</p>
+@for (character of characterService.characters(); track character.id) {
+  <div>
+    {{ character.name }}
+  </div>
+} @empty {
+  <div>No hay personajes</div>
+}
