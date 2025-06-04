@@ -1,3 +1,4 @@
+<p>Loading: {{ characterService.loading() }}</p>
 @for (character of characterService.characters(); track character.id) {
   <div>
     {{ character.name }}

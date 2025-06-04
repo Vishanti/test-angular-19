@@ -1,5 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { computed, inject, Injectable, signal } from '@angular/core';
+import { delay } from 'rxjs';
 
 export interface CharacterResponseModel {
   items: CharacterModel[];
@@ -68,6 +69,7 @@ export class CharacterService {
 
   getCharacterList() {
     this.http.get<CharacterResponseModel>(this.BASE_URL + this.getCharacgtersApi)
+      .pipe(delay(5000))
       .subscribe(res => {
         res.items.forEach(character => {
           this.#characterState().characters.set(character.id, character);
