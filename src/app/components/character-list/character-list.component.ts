@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, inject } from '@angular/core';
 import { CharacterService } from '../../services/character-service.service';
 import { CommonModule } from '@angular/common';
 
@@ -11,4 +11,13 @@ import { CommonModule } from '@angular/common';
 })
 export class CharacterListComponent {
   public characterService = inject(CharacterService);
+  public error = this.characterService.error;
+
+  showGetCharactersError = effect(() => {
+    const errorMsg = this.error();
+    if (errorMsg) {
+      console.log(errorMsg);
+    }
+  });
+
 }
