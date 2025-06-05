@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { computed, inject, Injectable, signal } from '@angular/core';
-import { delay } from 'rxjs';
+import { catchError, delay, of } from 'rxjs';
 
 export interface CharacterResponseModel {
   items: CharacterModel[];
@@ -44,6 +44,7 @@ export interface Meta {
 interface CharacterState {
   characters: Map<number, CharacterModel>;
   loading: boolean;
+  error: string | null;
 }
 
 @Injectable({
@@ -56,10 +57,12 @@ export class CharacterService {
 
   #characterState = signal<CharacterState>({
     loading: true,
+    error: null,
     characters: new Map<number, CharacterModel>()
   });
 
   public loading = computed(() => this.#characterState().loading);
+  public error = computed(() => this.#characterState().error);
   public characters = computed(() => Array.from(this.#characterState().characters.values()));
 
   constructor() {
@@ -68,18 +71,29 @@ export class CharacterService {
 
 
   getCharacterList() {
-    this.http.get<CharacterResponseModel>(this.BASE_URL + this.getCharacgtersApi)
-      .pipe(delay(5000))
+    return this.http.get<CharacterResponseModel>(this.BASE_URL + this.getCharacgtersApi)
+      .pipe(delay(2000))
+      .pipe(
+        catchError(() => {
+          this.#characterState.update(state => ({
+            ...state,
+            loading: false,
+            error: 'No se pudieron cargar los personajes. Intenta nuevamente más tarde.'
+          }));
+          return of(null); // Retorna null para continuar la suscripción
+        })
+      )
       .subscribe(res => {
+        if (!res) return;
         res.items.forEach(character => {
           this.#characterState().characters.set(character.id, character);
         });
 
         this.#characterState.set({
           loading: false,
+          error: null,
           characters: this.#characterState().characters
         });
       });
-
   }
 }
