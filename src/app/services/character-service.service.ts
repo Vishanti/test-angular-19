@@ -56,7 +56,7 @@ export class CharacterService {
   private readonly getCharacgtersApi = '/characters?limit=100';
 
   #characterState = signal<CharacterState>({
-    loading: true,
+    loading: false,
     error: null,
     characters: new Map<number, CharacterModel>()
   });
@@ -66,11 +66,13 @@ export class CharacterService {
   public characters = computed(() => Array.from(this.#characterState().characters.values()));
 
   constructor() {
-    this.getCharacterList();
+    // this.getCharacterList();
   }
 
 
   getCharacterList() {
+    this.#characterState.update(state => ({ ...state, loading: true }));
+
     return this.http.get<CharacterResponseModel>(this.BASE_URL + this.getCharacgtersApi)
       .pipe(delay(2000))
       .pipe(

@@ -20,4 +20,8 @@ export class CharacterListComponent {
     }
   });
 
+  getCharacters() {
+    this.characterService.getCharacterList();
+  }
+
 }
